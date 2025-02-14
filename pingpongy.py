@@ -28,16 +28,19 @@ class Player(GameSprite):
             self.rect.y -= self.speed
         if keys_pressed[K_s] and self.rect.y < 420:
             self.rect.y += self.speed
-    def shoot(self):
-        pass
-    def fire(self):
-        bullet = Bullet('bullet.png', 10, 10, 30, self.rect.centerx, self.rect.top)
-        bullets.add(bullet)
 class Ball(GameSprite):
+    def __init__(self, pl_image, pl_speed, pl_w, pl_h, pl_x, pl_y, speed_x, speed_y):
+        super().__init__(pl_image, pl_speed, pl_w, pl_h, pl_x, pl_y)
+        self.speed_x = speed_x
+        self.speed_y = speed_y
     def update(self):
-        pass
-player1 = Player('canoe.png', 10, 65, 65, 50, 420)
-player2 = Player('canoe.png', 10, 65, 65, 570, 50)
+        self.rect.x += self.speed_x
+        self.rect.y += self.speed_y
+        if self.rect.y < 0 or self.rect.y > 430:        
+            self.speed_y *= -1
+player1 = Player('canoe.png', 10, 65, 65, 50, 430)
+player2 = Player('canoe.png', 10, 65, 65, 570, 10)
+ball = Ball('tennis.png', 5, 65, 65, 50, 50, 5, 5)
 # создание окна
 window = display.set_mode((700, 500))
 display.set_caption('Ping Pongy!')
@@ -45,6 +48,9 @@ display.set_caption('Ping Pongy!')
 background = transform.scale(image.load('forest.jpg'), (700, 500))
 # ИЦ
 font.init()
+font = font.Font(None, 70)
+font1 = font.render('PLAYER 1 LOST ;(', True, (255, 0, 0))
+font2 = font.render('PLAYER 2 LOST ;(', True, (255, 0, 0))
 fps = 60
 clock = time.Clock()
 game = True
@@ -56,8 +62,16 @@ while game:
     if finish != True:
         player1.update_l()
         player2.update_r()
+        ball.update()
         window.blit(background, (0, 0))
         player1.reset()
         player2.reset()
+        ball.reset()
+        if sprite.collide_rect(ball, player1) or sprite.collide_rect(ball, player2):
+            ball.speed_x *= -1
+        if ball.rect.x <= 0:
+            window.blit(font1, (170, 240))
+        if ball.rect.x >= 700:
+            window.blit(font2, (170, 240))
     display.update()
     clock.tick(fps)
