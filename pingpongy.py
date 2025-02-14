@@ -40,7 +40,9 @@ class Ball(GameSprite):
             self.speed_y *= -1
 player1 = Player('canoe.png', 10, 65, 65, 50, 430)
 player2 = Player('canoe.png', 10, 65, 65, 570, 10)
-ball = Ball('tennis.png', 5, 65, 65, 50, 50, 5, 5)
+ball = Ball('tennis.png', 5, 65, 65, 200, 200, 5, 5)
+player1_win = 0
+player2_win = 0
 # создание окна
 window = display.set_mode((700, 500))
 display.set_caption('Ping Pongy!')
@@ -49,8 +51,6 @@ background = transform.scale(image.load('forest.jpg'), (700, 500))
 # ИЦ
 font.init()
 font = font.Font(None, 70)
-font1 = font.render('PLAYER 1 LOST ;(', True, (255, 0, 0))
-font2 = font.render('PLAYER 2 LOST ;(', True, (255, 0, 0))
 fps = 60
 clock = time.Clock()
 game = True
@@ -64,14 +64,22 @@ while game:
         player2.update_r()
         ball.update()
         window.blit(background, (0, 0))
+        font1 = font.render('1S GOALS:' + str(player1_win), True, (255, 0, 0))
+        font2 = font.render('2S GOALS:' + str(player2_win), True, (255, 0, 0))
+        window.blit(font1, (10, 10))
+        window.blit(font2, (10, 50))
         player1.reset()
         player2.reset()
         ball.reset()
         if sprite.collide_rect(ball, player1) or sprite.collide_rect(ball, player2):
             ball.speed_x *= -1
         if ball.rect.x <= 0:
-            window.blit(font1, (170, 240))
+            player1_win += 1
+            ball.rect.x = 200
+            ball.rect.y = 200
         if ball.rect.x >= 700:
-            window.blit(font2, (170, 240))
+            player2_win += 1
+            ball.rect.x = 200
+            ball.rect.y = 200
     display.update()
     clock.tick(fps)
