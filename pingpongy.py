@@ -20,13 +20,13 @@ class Player(GameSprite):
         keys_pressed = key.get_pressed()
         if keys_pressed[K_UP] and self.rect.y > 10:
             self.rect.y -= self.speed
-        if keys_pressed[K_DOWN] and self.rect.y < 420:
+        if keys_pressed[K_DOWN] and self.rect.y < 920:
             self.rect.y += self.speed
     def update_r(self):
         keys_pressed = key.get_pressed()
         if keys_pressed[K_w] and self.rect.y > 10:
             self.rect.y -= self.speed
-        if keys_pressed[K_s] and self.rect.y < 420:
+        if keys_pressed[K_s] and self.rect.y < 920:
             self.rect.y += self.speed
 class Ball(GameSprite):
     def __init__(self, pl_image, pl_speed, pl_w, pl_h, pl_x, pl_y, speed_x, speed_y):
@@ -36,18 +36,26 @@ class Ball(GameSprite):
     def update(self):
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
-        if self.rect.y < 0 or self.rect.y > 430:        
+        if self.rect.y < 0 or self.rect.y > 930:        
             self.speed_y *= -1
-player1 = Player('canoe.png', 10, 65, 65, 50, 430)
-player2 = Player('canoe.png', 10, 65, 65, 570, 10)
-ball = Ball('tennis.png', 5, 65, 65, 200, 200, 5, 5)
+    def push(self, paddle):
+        height = paddle.rect.bottom-paddle.rect.top
+        if self.rect.centery <= paddle.rect.top + height*2/5:
+            self.speed_y = -3
+        elif self.rect.centery <= paddle.rect.top + height*3/5:
+            self.speed_y = 0
+        else:
+            self.speed_y = 3
+player1 = Player('bat.png', 10, 65, 65, 60, 430)
+player2 = Player('bat.png', 10, 65, 65, 870, 10)
+ball = Ball('tennis.png', 5, 65, 65, 500, 500, 5, 5)
 player1_win = 0
 player2_win = 0
 # создание окна
-window = display.set_mode((700, 500))
+window = display.set_mode((1000, 1000))
 display.set_caption('Ping Pongy!')
 # создание сцены
-background = transform.scale(image.load('forest.jpg'), (700, 500))
+background = transform.scale(image.load('forest.jpg'), (1000, 1000))
 # ИЦ
 font.init()
 font = font.Font(None, 70)
@@ -64,22 +72,28 @@ while game:
         player2.update_r()
         ball.update()
         window.blit(background, (0, 0))
-        font1 = font.render('1S GOALS:' + str(player1_win), True, (255, 0, 0))
-        font2 = font.render('2S GOALS:' + str(player2_win), True, (255, 0, 0))
+        font1 = font.render(str(player1_win), True, (255, 0, 0))
+        font2 = font.render(str(player2_win), True, (0, 255, 0))
         window.blit(font1, (10, 10))
-        window.blit(font2, (10, 50))
+        window.blit(font2, (960, 10))
         player1.reset()
         player2.reset()
         ball.reset()
-        if sprite.collide_rect(ball, player1) or sprite.collide_rect(ball, player2):
+        if sprite.collide_rect(ball, player1):
             ball.speed_x *= -1
+            ball.push(player1)
+        if sprite.collide_rect(ball, player2):
+            ball.speed_x *= -1
+            ball.push(player2)
         if ball.rect.x <= 0:
             player1_win += 1
-            ball.rect.x = 200
-            ball.rect.y = 200
-        if ball.rect.x >= 700:
+            ball.speed_x *= -1
+            ball.rect.x = 500
+            ball.rect.y = 500
+        if ball.rect.x >= 1000:
             player2_win += 1
-            ball.rect.x = 200
-            ball.rect.y = 200
+            ball.speed_x *= -1
+            ball.rect.x = 500
+            ball.rect.y = 500
     display.update()
     clock.tick(fps)
