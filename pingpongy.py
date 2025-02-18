@@ -41,11 +41,15 @@ class Ball(GameSprite):
     def push(self, paddle):
         height = paddle.rect.bottom-paddle.rect.top
         if self.rect.centery <= paddle.rect.top + height*2/5:
-            self.speed_y = -3
+            self.speed_y = -5
         elif self.rect.centery <= paddle.rect.top + height*3/5:
+            self.speed_y = -3
+        elif self.rect.centery <= paddle.rect.top + height*4/5:
             self.speed_y = 0
-        else:
+        elif self.rect.centery <= paddle.rect.top + height*5/5:
             self.speed_y = 3
+        else:
+            self.speed_y = 5
 player1 = Player('bat.png', 10, 65, 65, 60, 430)
 player2 = Player('bat.png', 10, 65, 65, 870, 10)
 ball = Ball('tennis.png', 5, 65, 65, 500, 500, 5, 5)
@@ -74,6 +78,8 @@ while game:
         window.blit(background, (0, 0))
         font1 = font.render(str(player1_win), True, (255, 0, 0))
         font2 = font.render(str(player2_win), True, (0, 255, 0))
+        font3 = font.render('YOU LOSE ;(', True, (255, 0, 0))
+        font4 = font.render('YOU LOSE ;(', True, (0, 255, 0))
         window.blit(font1, (10, 10))
         window.blit(font2, (960, 10))
         player1.reset()
@@ -95,5 +101,13 @@ while game:
             ball.speed_x *= -1
             ball.rect.x = 500
             ball.rect.y = 500
+        if player1_win >= 10:
+            finish = True
+            ball.kill()
+            window.blit(font4, (400, 500))
+        if player2_win >= 10:
+            finish = True
+            ball.kill()
+            window.blit(font3, (400, 500))
     display.update()
     clock.tick(fps)
